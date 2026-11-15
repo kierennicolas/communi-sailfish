@@ -1,0 +1,60 @@
+# Builds installable RPMs for Sailfish OS on every push, using the Sailfish SDK
+# Docker images by coderus. Download them from the run's "Artifacts", or from
+# the Releases page when you push a tag starting with "v" (e.g. v0.11-dcc1).
+#
+# They're built against Sailfish OS 4.5, so they run on 4.5 and later.
+name: Build RPMs
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  RELEASE: 4.5.0.16
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [aarch64, armv7hl, i486]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build for ${{ matrix.arch }}
+        run: |
+          mkdir -p RPMS
+          chmod a+w RPMS
+          # Copy the whole tree, including .qmake.conf, into the SDK container and build.
+          docker run --rm --privileged \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            coderus/sailfishos-platform-sdk:$RELEASE \
+            /bin/bash -c "set -ex
+              mkdir -p ~/build && cp -a /workspace/. ~/build/ && cd ~/build
+              rm -rf RPMS
+              mb2 -t SailfishOS-$RELEASE-${{ matrix.arch }} build
+              cp RPMS/*.rpm /workspace/RPMS/"
+          ls -l RPMS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: harbour-communi-${{ matrix.arch }}
+          path: RPMS/*.rpm
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: RPMS
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: RPMS/*.rpm

@@ -27,6 +27,7 @@
 */
 
 #include "messageformatter.h"
+#include "dccmanager.h"
 #include <IrcTextFormat>
 #include <IrcConnection>
 #include <IrcUserModel>
@@ -386,12 +387,39 @@ QString MessageFormatter::formatPongMessage(IrcPongMessage* message, Qt::TextFor
     return formatPingReply(message->prefix(), message->argument(), format);
 }
 
+// "DCC SEND" offers: say what is offered, with a link to accept it.
+static QString formatDccRequest(IrcPrivateMessage* message, const QString& sender, const QString& target, Qt::TextFormat format)
+{
+    const DccManager::Offer offer = DccManager::parseOffer(message->content());
+    if (offer.type != QLatin1String("SEND") || !offer.valid)
+        return QCoreApplication::translate("MessageFormatter", "%1 requested CTCP %2").arg(sender, QStringLiteral("dcc"));
+
+    QString file = format == Qt::RichText ? QStringLiteral("<b>%1</b>").arg(offer.fileName.toHtmlEscaped()) : offer.fileName;
+    if (offer.size > 0)
+        file = QStringLiteral("%1 (%2)").arg(file, DccManager::formatSize(offer.size));
+
+    if (message->isOwn())
+        return QCoreApplication::translate("MessageFormatter", "You offered %1 to %2").arg(file, target);
+    if (offer.passive)
+        return QCoreApplication::translate("MessageFormatter", "%1 offered %2 as a passive transfer, which isn't supported. Ask them to send it normally.").arg(sender, file);
+    if (message->property("dccExpired").toBool())
+        return QCoreApplication::translate("MessageFormatter", "%1 offered %2 (expired)").arg(sender, file);
+
+    QString text = QCoreApplication::translate("MessageFormatter", "%1 wants to send you %2").arg(sender, file);
+    const QVariant id = message->property("dccId");
+    if (format == Qt::RichText && id.isValid())
+        text += QStringLiteral(" <a href=\"communi-dcc:%1\">%2</a>").arg(id.toInt()).arg(QCoreApplication::translate("MessageFormatter", "Accept or decline"));
+    return text;
+}
+
 QString MessageFormatter::formatPrivateMessage(IrcPrivateMessage* message, Qt::TextFormat format) const
 {
     const QString sender = formatNick(message->nick(), format, message->isOwn());
     const QString msg = formatContent(message->content(), format);
     if (message->isAction())
         return QStringLiteral("%1 %2").arg(message->nick(), msg);
+    else if (message->isRequest() && message->content().startsWith(QLatin1String("DCC "), Qt::CaseInsensitive))
+        return formatDccRequest(message, sender, formatNick(message->target(), format), format);
     else if (message->isRequest())
         return QCoreApplication::translate("MessageFormatter", "%1 requested CTCP %2").arg(sender, msg.split(" ").value(0).toLower());
     else if (format == Qt::PlainText)

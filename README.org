@@ -2,6 +2,27 @@
 
 The first and foremost IRC client for Sailfish, based on the Communi IRC framework.
 
+* DCC file transfers (this fork)
+
+This fork adds DCC SEND file transfers, both ways, including through bouncers
+such as ZNC (bouncedcc):
+
++ Receiving: an offer shows up in the private chat ("alice wants to send you
+  photo.jpg (1.2 MB) Accept or decline") and notifies like a message. Tap the
+  link, or pull down and open *File transfers*, then *Accept*. Files are saved
+  in Downloads; while downloading they are named =<file>.part=.
++ Sending: in a private chat, pull down and choose *Send a file*, or type
+  =/DCC SEND <nick> <path>=. The receiver connects to your phone, so your phone
+  must be reachable from it (or from your bouncer). Sailfish OS allows incoming
+  connections on ports 1024-65535 by default. Behind a router, set a fixed
+  range in *Settings > File transfers* and forward those ports to the phone.
++ =/DCC= opens the transfers list.
+
+Only "active" DCC is supported (not passive/reverse DCC), which is what ZNC
+relays. Builds for Sailfish OS 4.5 and later are made by GitHub Actions
+(=.github/workflows/build.yml=); download the RPM for your phone's architecture
+from the run's artifacts and install it with =pkcon install-local=.
+
 * Building or Installing
 
 Please read [[./INSTALL.org]]

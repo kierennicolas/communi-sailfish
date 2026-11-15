@@ -51,6 +51,7 @@
 #include "pluginloader.h"
 #include "settingsproxy.h"
 #include "aboutdata.h"
+#include "dccmanager.h"
 
 #include <IrcCore>
 #include <IrcModel>
@@ -137,6 +138,14 @@ Q_DECL_EXPORT int main(int argc, char* argv[])
     viewer->rootContext()->setContextProperty("ActivityModel", activity);
     QObject::connect(storage, &MessageStorage::added, activity, &ActivityModel::add);
     QObject::connect(storage, &MessageStorage::removed, activity, &ActivityModel::remove);
+
+    // DCC file transfers. Connected before IgnoreManager so that its filter
+    // runs after the ignore list: offers from ignored users are dropped.
+    DccManager* dcc = new DccManager(app.data());
+    dcc->setMessageStorage(storage);
+    viewer->rootContext()->setContextProperty("DccManager", dcc);
+    QObject::connect(model, &BufferProxyModel::connectionAdded, dcc, &DccManager::addConnection);
+    QObject::connect(model, &BufferProxyModel::connectionRemoved, dcc, &DccManager::removeConnection);
 
     IgnoreManager* ignore = IgnoreManager::instance();;
     viewer->rootContext()->setContextProperty("IgnoreManager", ignore);

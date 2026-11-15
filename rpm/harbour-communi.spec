@@ -9,12 +9,12 @@
 # << macros
 
 Name:       harbour-communi
-Version:    0.10
+Version:    0.11
 Summary:    The IRC client for Sailfish OS
 License:    LGPLv2 and BSD
 URL:        http://communi.github.io/
 Source0:    %{name}-%{version}.tar.gz
-Release:    1
+Release:    1.dcc
 Requires:   sailfishsilica-qt5 >= 0.10.9
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
@@ -27,6 +27,7 @@ BuildRequires:  python3-cairosvg
 
 %description
 A simple and elegant IRC client for Sailfish OS, based on Qt and the Communi IRC framework.
+This build adds DCC file transfers: receive and send files, also through bouncers such as ZNC.
 
 %prep
 %autosetup

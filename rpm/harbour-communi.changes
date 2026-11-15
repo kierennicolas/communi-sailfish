@@ -1,3 +1,12 @@
+* Sun Nov 15 2026 Kieren 0.11-1.dcc
+- Add DCC file transfers (DCC SEND), in both directions
+- Incoming offers show in the chat with an "Accept or decline" link and notify
+  like a private message; files are saved to Downloads (as .part until done)
+- Send a file from a private chat's pull-down menu, or with /DCC SEND <nick> <file>
+- New "File transfers" page: accept, decline, cancel, open, clear
+- Settings: optional fixed port range for sending (for phones behind a router)
+- Request access to user folders (UserDirs, MediaIndexing) for picking and saving files
+
 * Fri Feb 22 2019 Björn Bidar <theodorstormgrade@gmail.com> 0.10+lyro_merge
 - Move changelog to changes file as listed in Packaging Guidelines
 - Fix regression intruded by updating communi-shared (also fixes #115)

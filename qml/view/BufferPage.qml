@@ -30,6 +30,7 @@ import QtQuick 2.1
 import Communi 3.5
 import MessageFilter 1.0
 import Sailfish.Silica 1.0
+import Sailfish.Pickers 1.0
 
 Page {
     id: page
@@ -41,6 +42,29 @@ Page {
     readonly property var storage: MessageStorage.get(buffer)
 
     allowedOrientations: window.allowedOrientations
+
+    // A private chat with someone (not a channel or the server window).
+    readonly property bool isQuery: !!buffer && !buffer.channel && !buffer.sticky
+
+    function openTransfers() {
+        pageStack.push(Qt.resolvedUrl("TransfersPage.qml"))
+    }
+
+    function pickFileToSend() {
+        pageStack.push(filePicker)
+    }
+
+    Component {
+        id: filePicker
+        ContentPickerPage {
+            title: qsTr("Send to %1").arg(page.buffer ? page.buffer.title : "")
+            onSelectedContentPropertiesChanged: {
+                var path = selectedContentProperties.filePath
+                if (path && page.buffer)
+                    DccManager.sendFile(page.buffer, path)
+            }
+        }
+    }
 
     Binding {
         target: storage
@@ -83,6 +107,18 @@ Page {
                         // TODO: why the view position jumps?
                         storage.clear()
                     }
+                }
+                MenuItem {
+                    text: DccManager.pendingOffers > 0 ? qsTr("File transfers (%1 waiting)").arg(DccManager.pendingOffers)
+                                                       : qsTr("File transfers")
+                    visible: DccManager.count > 0
+                    onClicked: page.openTransfers()
+                }
+                MenuItem {
+                    text: qsTr("Send a file")
+                    visible: page.isQuery
+                    enabled: !!buffer && buffer.connection.connected
+                    onClicked: page.pickFileToSend()
                 }
             }
 
@@ -161,7 +197,12 @@ Page {
                     linkColor: Theme.highlightColor
                     font.pixelSize: fontSizeConfig.value
                     font.family: fontStyleConfig.value ? "Monospace" : Theme.fontFamily
-                    onLinkActivated: Qt.openUrlExternally(link)
+                    onLinkActivated: {
+                        if (link.indexOf("communi-dcc:") === 0)
+                            page.openTransfers()
+                        else
+                            Qt.openUrlExternally(link)
+                    }
                     color: highlight ? window.nickHighlight : event ? Theme.secondaryColor : Theme.primaryColor
                     onWidthChanged: doLayout()
                 }

@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = harbour-communi
 CONFIG += c++11 sailfishapp_nodata
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
-QT += dbus
+QT += dbus network
 VERSION = 1.0-alpha
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -18,6 +18,8 @@ HEADERS += $$PWD/activitymodel.h
 HEADERS += $$PWD/aboutdata.h
 HEADERS += $$PWD/bufferfiltermodel.h
 HEADERS += $$PWD/bufferproxymodel.h
+HEADERS += $$PWD/dccmanager.h
+HEADERS += $$PWD/dcctransfer.h
 HEADERS += $$PWD/messagefilter.h
 HEADERS += $$PWD/messageformatter.h
 HEADERS += $$PWD/messagemodel.h
@@ -31,6 +33,8 @@ SOURCES += $$PWD/activitymodel.cpp
 SOURCES += $$PWD/aboutdata.cpp
 SOURCES += $$PWD/bufferfiltermodel.cpp
 SOURCES += $$PWD/bufferproxymodel.cpp
+SOURCES += $$PWD/dccmanager.cpp
+SOURCES += $$PWD/dcctransfer.cpp
 SOURCES += $$PWD/messagefilter.cpp
 SOURCES += $$PWD/messageformatter.cpp
 SOURCES += $$PWD/messagemodel.cpp

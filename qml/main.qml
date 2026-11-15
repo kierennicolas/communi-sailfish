@@ -88,6 +88,18 @@ ApplicationWindow {
         value: sortMethodConfig.value
     }
 
+    Binding {
+        target: DccManager
+        property: "firstPort"
+        value: dccFirstPortConfig.value
+    }
+
+    Binding {
+        target: DccManager
+        property: "lastPort"
+        value: dccLastPortConfig.value
+    }
+
     Connections {
         target: Qt.application
         onAboutToQuit: notification.close()
@@ -234,6 +246,18 @@ ApplicationWindow {
        id: feedbackConfig
        key: "/apps/harbour-communi/settings/feedback"
        defaultValue: true
+    }
+
+    ConfigurationValue {
+       id: dccFirstPortConfig
+       key: "/apps/harbour-communi/settings/dccfirstport"
+       defaultValue: 0
+    }
+
+    ConfigurationValue {
+       id: dccLastPortConfig
+       key: "/apps/harbour-communi/settings/dcclastport"
+       defaultValue: 0
     }
 
     ConfigurationValue {

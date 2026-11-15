@@ -86,6 +86,16 @@ Page {
        key: "/apps/harbour-communi/settings/feedback"
        defaultValue: true
     }
+    ConfigurationValue {
+       id: dccFirstPortConfig
+       key: "/apps/harbour-communi/settings/dccfirstport"
+       defaultValue: 0
+    }
+    ConfigurationValue {
+       id: dccLastPortConfig
+       key: "/apps/harbour-communi/settings/dcclastport"
+       defaultValue: 0
+    }
 
     SilicaListView {
         anchors.fill: parent
@@ -182,6 +192,38 @@ Page {
                 description: qsTr("Specifies whether haptic feedback is enabled when not having the app in foreground")
                 checked: feedbackBgConfig.value
                 onCheckedChanged: feedbackBgConfig.value = checked
+            }
+            SectionHeader { text: qsTr("File transfers") }
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.Wrap
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryHighlightColor
+                text: qsTr("Received files are saved in %1. When you send a file, the other side connects to your phone on a port from this range. Leave both at 0 to use any free port; set a range only if your phone is behind a router that forwards those ports to it.").arg(DccManager.downloadDirectory)
+            }
+            TextField {
+                width: parent.width
+                label: qsTr("First port")
+                placeholderText: qsTr("First port (0 = any)")
+                inputMethodHints: Qt.ImhDigitsOnly
+                validator: IntValidator { bottom: 0; top: 65535 }
+                text: dccFirstPortConfig.value
+                onTextChanged: if (acceptableInput) dccFirstPortConfig.value = parseInt(text)
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: lastPortField.focus = true
+            }
+            TextField {
+                id: lastPortField
+                width: parent.width
+                label: qsTr("Last port")
+                placeholderText: qsTr("Last port (0 = any)")
+                inputMethodHints: Qt.ImhDigitsOnly
+                validator: IntValidator { bottom: 0; top: 65535 }
+                text: dccLastPortConfig.value
+                onTextChanged: if (acceptableInput) dccLastPortConfig.value = parseInt(text)
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                EnterKey.onClicked: focus = false
             }
         }
         VerticalScrollDecorator { }

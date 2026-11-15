@@ -94,6 +94,18 @@ FocusScope {
                             imask = IgnoreManager.addIgnore(imask)
                             MessageStorage.get(buffer).info(qsTr("Ignored: %1").arg(imask))
                         }
+                    } else if (cmd.parameters[0] === "DCC") {
+                        var sub = (cmd.parameters[1] || "").toUpperCase()
+                        if (sub === "SEND" && cmd.parameters[2] && cmd.parameters.length > 3) {
+                            var dccBuf = buffer.model.add(cmd.parameters[2])
+                            DccManager.sendFile(dccBuf, cmd.parameters.slice(3).join(" "))
+                            if (dccBuf !== buffer)
+                                pageStack.replace(bufferPage, {buffer: dccBuf})
+                        } else if (sub === "SEND") {
+                            MessageStorage.get(buffer).info(qsTr("Usage: /DCC SEND <nick> <file>, or pull down in a private chat and choose \"Send a file\""))
+                        } else {
+                            pageStack.push(Qt.resolvedUrl("TransfersPage.qml"))
+                        }
                     } else if (cmd.parameters[0] === "UNIGNORE") {
                         var umask = IgnoreManager.removeIgnore(cmd.parameters[1])
                         MessageStorage.get(buffer).info(qsTr("Unignored: %1").arg(umask))
@@ -226,6 +238,7 @@ FocusScope {
             parser.addCommand(IrcCommand.Custom, "MSG <user/channel> <message...>")
             parser.addCommand(IrcCommand.Custom, "IGNORE (<mask>)");
             parser.addCommand(IrcCommand.Custom, "UNIGNORE <mask>");
+            parser.addCommand(IrcCommand.Custom, "DCC (<SEND/LIST>) (<nick>) (<file...>)");
         }
     }
 

@@ -23,6 +23,7 @@
         <file>qml/view/PanelView.qml</file>
         <file>qml/view/SearchToolBar.qml</file>
         <file>qml/view/TextEntry.qml</file>
+        <file>qml/view/TransfersPage.qml</file>
         <file>qml/view/UserListPanel.qml</file>
         <file>qml/main.qml</file>
     </qresource>
