@@ -23,7 +23,6 @@ BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(sailfishapp) >= 0.0.10
 BuildRequires:  pkgconfig(mlite5)
 BuildRequires:  qt5-qttools-linguist
-BuildRequires:  python3-cairosvg
 
 %description
 A simple and elegant IRC client for Sailfish OS, based on Qt and the Communi IRC framework.
